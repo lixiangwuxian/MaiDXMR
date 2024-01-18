@@ -1,6 +1,8 @@
 # MaiDXMR
 
-Aim to support hand tracking as input in quest.(This project uses OpenXR, so it should be easy to port to other headset with hand tracking)
+Aim to support hand tracking as input in quest.
+
+Since this project uses OpenXR, it should be easy to port to other headset with hand tracking.
 
 Work in progress.
 
