@@ -10,7 +10,6 @@ public class ScreenManager : MonoBehaviour
 {
     public static ScreenManager instance;
     private Material DisplayP1Mat;
-    private Material DisplayP2Mat;
     private PopH264.Decoder Decoder;
     private PopH264.DecoderParams param;
     private PopH264.FrameInput h264Frame;

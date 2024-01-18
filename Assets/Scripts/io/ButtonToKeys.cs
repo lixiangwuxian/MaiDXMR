@@ -51,7 +51,8 @@ public class ButtonToKey : MonoBehaviour
         Key_Z = 90,
         Key_A = 65,
         Key_3 = 51,
-        Select = 145,
-        Enter = 13,
+        GameTest = 145,
+        xxx = 13,
+        Pause = 19,
     }
 }
