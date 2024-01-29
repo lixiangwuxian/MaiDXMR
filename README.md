@@ -23,7 +23,9 @@ Uses [PopH264](https://github.com/NewChromantics/PopH264) to decode h264 stream.
 3. Modify IP addr in Assets/Scripts/io/UDPClient.cs to your computer
 4. Build & Run
 
-TODO:
+Require [MaiDXMR_backend](https://github.com/lixiangwuxian/MaiDXMR_backend) runs in computer after sinmai.exe started
+
+## TODO:
 
 - [ ] find the pc IP address automatically
 - [ ] sync to pc on frame send
