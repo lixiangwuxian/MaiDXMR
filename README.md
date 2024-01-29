@@ -16,6 +16,13 @@ This front-end part just does receive h264 stream while send input back to the c
 
 Uses [PopH264](https://github.com/NewChromantics/PopH264) to decode h264 stream.
 
+## Build
+
+1. Install Unity Editor 2022.3.16 LTS
+2. Import [PopH264 Package](https://github.com/NewChromantics/PopH264#unity)
+3. Modify IP addr in Assets/Scripts/io/UDPClient.cs to your computer
+4. Build & Run
+
 TODO:
 
 - [ ] find the pc IP address automatically
