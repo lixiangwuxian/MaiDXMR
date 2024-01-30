@@ -12,8 +12,8 @@ public class UDPClient : MonoBehaviour
     public static UDPClient instance;
     public  UdpClient udpClient;
     public UdpClient udpServer;
-    public  string serverDomain = "192.168.6.124"; // 服务器的域名
-    public  string serverIp;
+    public  string serverDomain = "192.168.1.1"; // 服务器的域名
+    public  IPAddress serverIp;
     public  int serverPort = 10890;               // 服务器的端口
     public int listenPort = 10890;
     private Thread receiveThread;
@@ -29,11 +29,6 @@ public class UDPClient : MonoBehaviour
             Destroy(this);
             return;
         }
-        //send
-        udpClient = new UdpClient();  // 创建UDP客户端
-        Debug.Log("Starting create udp client, send to " + serverDomain + ", port is " + serverPort);
-        IPAddress[] addressList = Dns.GetHostAddresses(serverDomain);
-        serverIp = addressList[0].ToString();
         Debug.Log("Server Ip is " + serverIp.ToString());
         //listen
         udpServer = new UdpClient(listenPort);
@@ -48,7 +43,10 @@ public class UDPClient : MonoBehaviour
         try
         {
             byte[] bytesToSend = Encoding.UTF8.GetBytes(message);
-            udpClient.Send(bytesToSend, bytesToSend.Length, serverIp, serverPort);
+            if (udpClient != null)
+            {
+                udpClient.Send(bytesToSend, bytesToSend.Length, serverIp.ToString(), serverPort);
+            }
         }
         catch (System.Exception err)
         {
@@ -65,7 +63,10 @@ public class UDPClient : MonoBehaviour
         byteArray[2] = (byte)(isPressed?1:0);
         try
         {
-            udpClient.Send(byteArray, byteArray.Length, serverIp, serverPort);
+            if (udpClient != null)
+            {
+                udpClient.Send(byteArray, byteArray.Length, serverIp.ToString(), serverPort);
+            }
         }
         catch (System.Exception err)
         {
@@ -86,6 +87,14 @@ public class UDPClient : MonoBehaviour
                  ScreenManager.instance.jobs.Enqueue(() => {
                     ScreenManager.instance.UpdateScreen(receivedBytes);
                 });
+                if (udpClient == null)
+                {
+                    //send
+                    udpClient = new UdpClient();  // 创建UDP客户端
+                    Debug.Log("Starting create udp client, send to " + serverDomain + ", port is " + serverPort);
+                    IPAddress[] addressList = Dns.GetHostAddresses(serverDomain);
+                    serverIp = remoteEndPoint.Address;
+                }
             }
             catch (Exception ex)
             {
@@ -137,7 +146,10 @@ public class UDPClient : MonoBehaviour
                 byteArray[i / 8] |= (byte)(1 << (i % 8));
             }
         }
-        udpClient.Send(byteArray, byteArray.Length, serverIp, serverPort);
+        if (udpClient != null)
+        {
+            udpClient.Send(byteArray, byteArray.Length, serverIp.ToString(), serverPort);
+        }
     }
     public void UpdateKeyState(int key,bool state)
     {
