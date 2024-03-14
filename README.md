@@ -8,7 +8,9 @@ Since this project uses OpenXR, it should be easy to port to other headset with 
 
 ~~Currently not very playable due to high latency in encoding.~~
 
-With lantecy adjustment it's able to achieve 80% acc on a lv9 map.
+~~With lantecy adjustment it's able to achieve 80% acc on a lv9 map.~~
+
+After import alvr server code as encoder the latency goes to about 0.7s. I may have to read poph264 code later to understand why.
 
 Use assets from [MaiDXR](https://github.com/xiaopeng12138/MaiDXR).
 
