@@ -14,7 +14,7 @@ After import alvr server code as encoder the latency goes to about 0.7s. I may h
 
 Use assets from [MaiDXR](https://github.com/xiaopeng12138/MaiDXR).
 
-This front-end part just does receive h264 stream while send input back to the computer.
+This front-end part just does receive h264 stream and send input back to the computer.
 
 Uses [PopH264](https://github.com/NewChromantics/PopH264) to decode h264 stream.
 
