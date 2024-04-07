@@ -54,5 +54,6 @@ public class ButtonToKey : MonoBehaviour
         GameTest = 145,
         xxx = 13,
         Pause = 19,
+        Enter = 9,
     }
 }

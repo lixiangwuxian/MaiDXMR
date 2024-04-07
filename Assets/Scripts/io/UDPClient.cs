@@ -10,9 +10,8 @@ using System;
 public class UDPClient : MonoBehaviour
 {
     public static UDPClient instance;
-    public  UdpClient udpClient;
-    public UdpClient udpServer;
-    public  string serverDomain = "192.168.1.1"; // 服务器的域名
+    public  UdpClient udpAsClient;
+    public UdpClient udpAsServer;
     public  IPAddress serverIp;
     public  int serverPort = 10890;               // 服务器的端口
     public int listenPort = 10890;
@@ -29,23 +28,25 @@ public class UDPClient : MonoBehaviour
             Destroy(this);
             return;
         }
-        Debug.Log("Server Ip is " + serverIp.ToString());
+        //Debug.Log("Server Ip is " + serverIp.ToString());
         //listen
-        udpServer = new UdpClient(listenPort);
+        udpAsServer = new UdpClient(listenPort);
         Debug.Log("Starting create udp server, listen port is " + listenPort);
         receiveThread = new Thread(new ThreadStart(ReceiveData));
         receiveThread.IsBackground = true;
         receiveThread.Start();
+        //udpClient = new UdpClient(serverDomain, serverPort);
         //InputUpdater.Instance.SetTimer(SendKeyStates, 240);
     }
+
     public void SendString(string message)
     {
         try
         {
             byte[] bytesToSend = Encoding.UTF8.GetBytes(message);
-            if (udpClient != null)
+            if (udpAsClient != null)
             {
-                udpClient.Send(bytesToSend, bytesToSend.Length, serverIp.ToString(), serverPort);
+                udpAsClient.Send(bytesToSend, bytesToSend.Length, serverIp.ToString(), serverPort);
             }
         }
         catch (System.Exception err)
@@ -63,9 +64,9 @@ public class UDPClient : MonoBehaviour
         byteArray[2] = (byte)(isPressed?1:0);
         try
         {
-            if (udpClient != null)
+            if (udpAsClient != null)
             {
-                udpClient.Send(byteArray, byteArray.Length, serverIp.ToString(), serverPort);
+                udpAsClient.Send(byteArray, byteArray.Length, serverIp.ToString(), serverPort);
             }
         }
         catch (System.Exception err)
@@ -76,29 +77,27 @@ public class UDPClient : MonoBehaviour
 
     private void ReceiveData()
     {
+        Debug.Log("Start Receiving Data");
         while (true)
         {
             try
             {
                 IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                byte[] receivedBytes = udpServer.Receive(ref remoteEndPoint);
+                byte[] receivedBytes = udpAsServer.Receive(ref remoteEndPoint);
                 // 在这里处理接收到的数据
                 Debug.Log("Received data from " + remoteEndPoint );
                  ScreenManager.instance.jobs.Enqueue(() => {
                     ScreenManager.instance.UpdateScreen(receivedBytes);
                 });
-                if (udpClient == null)
+                if (udpAsClient == null)
                 {
-                    //send
-                    udpClient = new UdpClient();  // 创建UDP客户端
-                    Debug.Log("Starting create udp client, send to " + serverDomain + ", port is " + serverPort);
-                    IPAddress[] addressList = Dns.GetHostAddresses(serverDomain);
-                    serverIp = remoteEndPoint.Address;
+                    Debug.Log("Starting create udp client");
+                    udpAsClient = new UdpClient(remoteEndPoint);  // 创建UDP客户端
                 }
             }
             catch (Exception ex)
             {
-                if (udpServer == null || !udpServer.Client.Connected)
+                if (udpAsServer == null || !udpAsServer.Client.Connected)
                 {
                     // 当 UdpClient 被关闭时退出循环
                     break;
@@ -128,9 +127,9 @@ public class UDPClient : MonoBehaviour
         // 提取实际的消息内容
         //byte[] messageBytes = new byte[length];
         //Array.Copy(receivedBytes, 4, messageBytes, 0, length);
-        ScreenManager.instance.jobs.Enqueue(() => {
-            ScreenManager.instance.UpdateScreen(receivedBytes);
-        });
+        //ScreenManager.instance.jobs.Enqueue(() => {
+        //    ScreenManager.instance.UpdateScreen(receivedBytes);
+        //});
 
     }
 
@@ -146,9 +145,9 @@ public class UDPClient : MonoBehaviour
                 byteArray[i / 8] |= (byte)(1 << (i % 8));
             }
         }
-        if (udpClient != null)
+        if (udpAsClient != null)
         {
-            udpClient.Send(byteArray, byteArray.Length, serverIp.ToString(), serverPort);
+            udpAsClient.Send(byteArray, byteArray.Length, serverIp.ToString(), serverPort);
         }
     }
     public void UpdateKeyState(int key,bool state)
@@ -159,6 +158,6 @@ public class UDPClient : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        udpClient.Close();  // 关闭UDP客户端
+        udpAsClient.Close();  // 关闭UDP客户端
     }
 }

@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.newchromantics.poph264": {
-      "version": "file:C:/Users/lixiangwuxian/Desktop/PopH264.UnityPackage-main",
+      "version": "file:../PopH264.UnityPackage",
       "depth": 0,
       "source": "local",
       "dependencies": {}
@@ -202,7 +202,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
-      "version": "3.0.6",
+      "version": "3.0.8",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -242,7 +242,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.arfoundation": {
-      "version": "5.1.1",
+      "version": "5.1.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -281,7 +281,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.interaction.toolkit": {
-      "version": "2.5.2",
+      "version": "2.5.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -307,7 +307,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.management": {
-      "version": "4.4.0",
+      "version": "4.4.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
