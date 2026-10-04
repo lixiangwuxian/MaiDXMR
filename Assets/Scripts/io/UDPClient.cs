@@ -88,8 +88,10 @@ public class UDPClient : MonoBehaviour
                 ScreenManager.instance.EnqueuePacket(receivedBytes);
                 if (udpAsClient == null)
                 {
-                    Debug.Log("Starting create udp client");
-                    udpAsClient = new UdpClient(remoteEndPoint);  // 创建UDP客户端
+                    // Reply to whoever streams to us, i.e. the PC running the backend.
+                    serverIp = remoteEndPoint.Address;
+                    Debug.Log("Starting create udp client, server ip is " + serverIp);
+                    udpAsClient = new UdpClient();  // 创建UDP客户端
                 }
             }
             catch (Exception ex)
