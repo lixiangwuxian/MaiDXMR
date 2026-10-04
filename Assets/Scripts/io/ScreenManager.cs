@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -15,10 +16,10 @@ public class ScreenManager : MonoBehaviour
     private PopH264.Decoder Decoder;
     private PopH264.DecoderParams param;
     private PopH264.FrameInput h264Frame;
-    public Queue<Action> jobs = new Queue<Action>();
+    // Filled by the UDP receive thread, drained on the main thread in Update().
+    private readonly ConcurrentQueue<byte[]> pendingPackets = new ConcurrentQueue<byte[]>();
     List<Texture2D> h264Textures = new();
     List<PopH264.PixelFormat> pixelFormats = new();
-    private Thread updateThread = null;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,48 +40,39 @@ public class ScreenManager : MonoBehaviour
         param.DropBadFrames = true;
         Decoder = new PopH264.Decoder(param,true);
         h264Frame.FrameNumber = 0;
-        updateThread = new Thread(new ThreadStart(FixedUpdate));
-        updateThread.IsBackground = true;
-        updateThread.Start();
+    }
+
+    // Called from the UDP receive thread.
+    public void EnqueuePacket(byte[] h264ScreenData)
+    {
+        pendingPackets.Enqueue(h264ScreenData);
     }
 
     // Update is called once per frame
     void Update()
     {
-
-    }
-
-    private void FixedUpdate()
-    {
-        if (jobs.Count == 0)
+        // Feed everything that arrived since the last frame to the decoder.
+        while (pendingPackets.TryDequeue(out var packet))
         {
-            //sleep 1ms
-
+            h264Frame.Bytes = packet;
+            Decoder.PushFrameData(h264Frame);
+            h264Frame.FrameNumber++;
         }
-        while (jobs.Count > 0)
+
+        // Drain ALL decoded frames and keep only the newest one. Popping just one
+        // frame per pushed packet lets any decoder hiccup turn into a permanent
+        // backlog (= permanent latency) that never shrinks.
+        bool gotFrame = false;
+        while (GetNextFrame(ref h264Textures, ref pixelFormats) != null)
         {
-            jobs.Dequeue().Invoke();
+            gotFrame = true;
         }
-    }
-    public void UpdateScreen(byte[] h264ScreenData)
-    {
-        Debug.Log("UpdateScreen frame "+h264Frame.FrameNumber);
-        h264Frame.Bytes = h264ScreenData;
-        Decoder.PushFrameData(h264Frame);
-        h264Frame.FrameNumber++;
 
-        GetNextFrame(ref h264Textures, ref pixelFormats);
-        //Debug.Log("Got " + h264Textures.Count + " Frame");
-
-        if (h264Textures.Count > 0)
+        if (gotFrame && h264Textures.Count > 1)
         {
             DisplayP1Mat.SetTexture("_YTex", h264Textures[0]);
             DisplayP1Mat.SetTexture("_UVTex", h264Textures[1]);
-            //DisplayP1Mat.mainTexture = h264Textures[0];
-            //Debug.Log("Updated! Width is " + h264Textures[0].width + " height is " + h264Textures[0].height);
         }
-        //while (GetNextFrame(ref h264Textures, ref pixelFormats) != null) { }
-
     }
     public int? GetNextFrame(ref List<Texture2D> Planes, ref List<PixelFormat> PixelFormats)
     {

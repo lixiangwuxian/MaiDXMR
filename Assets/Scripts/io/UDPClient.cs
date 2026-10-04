@@ -85,10 +85,7 @@ public class UDPClient : MonoBehaviour
                 IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
                 byte[] receivedBytes = udpAsServer.Receive(ref remoteEndPoint);
                 // 在这里处理接收到的数据
-                Debug.Log("Received data from " + remoteEndPoint );
-                 ScreenManager.instance.jobs.Enqueue(() => {
-                    ScreenManager.instance.UpdateScreen(receivedBytes);
-                });
+                ScreenManager.instance.EnqueuePacket(receivedBytes);
                 if (udpAsClient == null)
                 {
                     Debug.Log("Starting create udp client");
